@@ -55,6 +55,19 @@ jobs:
           sudo touch /etc/pacman.d/mirrorlist
           cd ..
           
+          sudo git clone https://gitlab.manjaro.org/packages/core/manjaro-keyring.git
+          cd manjaro-keyring
+          sudo make PREFIX=/usr install
+          cd ..
+          
+          sudo git clone https://projects.archlinux.org/archlinux-keyring.git
+          cd manjaro-keyring
+          sudo make PREFIX=/usr install
+          cd ..          
+                    
+          sudo pacman-key --init
+          sudo pacman-key --populate archlinux manjaro
+          
           pkgver=23
           sudo wget https://git.archlinux.org/arch-install-scripts.git/snapshot/arch-install-scripts-$pkgver.tar.gz
           sudo tar -xvf arch-install-scripts-$pkgver.tar.gz
@@ -90,7 +103,7 @@ jobs:
               sudo make SYSCONFDIR=/etc PREFIX=/usr install_iso
           }
           
-          install_mjr_tools         
+          install_mjr_tools    
       -
         name: build
         env:
