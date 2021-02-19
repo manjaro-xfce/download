@@ -28,7 +28,7 @@ jobs:
         name: install-manjaro-tools
         run: |
           sudo apt-get update
-          sudo apt install gdisk zip systemd-container bmap-tools asciidoc libarchive-tools git build-essential cmake libarchive-dev pkg-config libcurl4-openssl-dev libgpgme-dev libssl-dev fakeroot dh-autoreconf haveged os-prober kwalify dosfstools libisoburn1 squashfs-tools
+          sudo apt install gdisk zip systemd-container bmap-tools asciidoc libarchive-tools git build-essential cmake libarchive-dev pkg-config libcurl4-openssl-dev libgpgme-dev libssl-dev fakeroot dh-autoreconf haveged os-prober kwalify dosfstools libisoburn1 squashfs-tools docbook2x
           
           sudo git clone https://gitlab.manjaro.org/packages/core/pacman.git
           cd pacman
