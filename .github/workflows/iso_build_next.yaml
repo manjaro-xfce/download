@@ -57,12 +57,17 @@ jobs:
           
           sudo git clone https://gitlab.manjaro.org/packages/core/manjaro-keyring.git
           cd manjaro-keyring
-          sudo make PREFIX=/usr install
+          sudo install -dm755 /usr/share/pacman/keyrings/
+          sudo install -m0644 manjaro.gpg /usr/share/pacman/keyrings/
+          sudo install -m0644 manjaro-trusted /usr/share/pacman/keyrings/
+          sudo install -m0644 manjaro-trusted /usr/share/pacman/keyrings/
           cd ..
           
           sudo git clone https://projects.archlinux.org/archlinux-keyring.git
           cd archlinux-keyring
-          sudo make PREFIX=/usr install
+          install -m0644 archlinux.gpg /usr/share/pacman/keyrings/
+          install -m0644 archlinux-trusted /usr/share/pacman/keyrings/
+          install -m0644 archlinux-revoked /usr/share/pacman/keyrings/
           cd ..          
                     
           sudo pacman-key --init
