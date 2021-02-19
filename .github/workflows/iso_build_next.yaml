@@ -109,12 +109,6 @@ jobs:
           }
           
           install_mjr_tools
-          
-          sudo git clone https://gitlab.manjaro.org/packages/core/grub.git
-          cd grub
-          sudo install -D -m0644 grub.cfg /boot/grub/grub.cfg
-          sudo install -D -m0644 grub.default /etc/default/grub
-          cd ..
       -
         name: build
         env:
@@ -122,10 +116,15 @@ jobs:
           BRANCH: ${{ matrix.BRANCH }}
           SCOPE: ${{ matrix.SCOPE }}
         run: |
-          mkdir -p manjaro-tools pkg-cache iso
-
-          [ "$SCOPE" == "minimal" ] && unset SCOPE
-
+          # Fix me !!!
+          sudo git clone https://gitlab.manjaro.org/packages/core/grub.git
+          cd grub
+          sudo install -D -m0644 grub.cfg /boot/grub/grub.cfg
+          sudo install -D -m0644 grub.default /etc/default/grub
+          cd ..
+          sudo mkdir -p /var/lib/manjaro-tools/buildiso/$EDITION/x86_64/livefs/usr/share/grub/themes/ubuntu-live
+                  
+          [ "$SCOPE" == "minimal" ] && unset SCOPE        
           sudo buildiso ${SCOPE:+-f} -p $EDITION -b $BRANCH -k linux510
           
           ls -lasih /var/cache/manjaro-tools/iso
