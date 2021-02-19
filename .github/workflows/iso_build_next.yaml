@@ -55,7 +55,7 @@ jobs:
         id: time
         uses: nanzm/get-time-action@v1.1
         with:
-          format: 'YYYYMMDD'          
+          format: 'YY.MM'          
       -
         name: install-build-dependencies
         run: |
@@ -160,7 +160,7 @@ jobs:
           EDITION: ${{ matrix.EDITION }}
           BRANCH: ${{ matrix.BRANCH }}
           SCOPE: ${{ matrix.SCOPE }}
-          VERSION: ${{ steps.time.outputs.time }}-dev
+          VERSION: ${{ steps.time.outputs.time }}
         run: |                
           [ "$SCOPE" == "minimal" ] && unset SCOPE
           
