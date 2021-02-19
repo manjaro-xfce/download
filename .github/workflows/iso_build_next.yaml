@@ -110,8 +110,11 @@ jobs:
           
           install_mjr_tools
           
-          # FIX-ME
-          sudo rm -v /usr/share/grub/themes/*
+          sudo git clone https://gitlab.manjaro.org/packages/core/grub.git
+          cd grub
+          sudo install -D -m0644 grub.cfg /boot/grub/grub.cfg
+          sudo install -D -m0644 grub.default /etc/default/grub
+          cd ..
       -
         name: build
         env:
