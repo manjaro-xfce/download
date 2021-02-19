@@ -1,0 +1,106 @@
+name: iso_build
+on:
+  workflow_dispatch:
+  schedule:
+    - cron:  '30 2 * * *'
+
+jobs:
+  release:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        EDITION: [xfce]
+        BRANCH: [unstable]
+        SCOPE: [minimal]
+    steps:
+      - 
+        uses: styfle/cancel-workflow-action@0.7.0
+        with:
+          access_token: ${{ github.token }}
+      - 
+        name: checkout
+        uses: actions/checkout@v2
+        with:
+          repository: manjaro-plasma/iso-profiles
+          token: "${{ secrets.GITHUB_TOKEN }}"
+          path: 'iso-profiles'
+      -
+        name: install-manjaro-tools
+        run: |
+          sudo apt-get update
+          sudo apt install gdisk zip systemd-container bmap-tools asciidoc libarchive-tools git build-essential cmake libarchive-dev pkg-config libcurl4-openssl-dev libgpgme-dev libssl-dev fakeroot dh-autoreconf haveged os-prober kwalify dosfstools libisoburn1 squashfs-tools
+          
+          sudo git clone https://gitlab.manjaro.org/packages/core/pacman.git
+          cd pacman
+          sudo wget https://sources.archlinux.org/other/pacman/pacman-5.2.2.tar.gz
+          sudo tar -xvf pacman-5.2.2.tar.gz
+          cd pacman-5.2.2
+          sudo patch -p1 -i ../pacman-sync-first-option.patch
+          sudo ./configure --prefix=/usr --sysconfdir=/etc \
+            --localstatedir=/var --enable-doc \
+            --with-scriptlet-shell=/usr/bin/bash \
+            --with-ldconfig=/usr/bin/ldconfig
+          sudo make V=1
+          sudo make install
+          cd ..
+          sudo install -m644 pacman.conf.x86_64 /etc/pacman.conf
+          sudo install -m644 makepkg.conf /etc/
+          sudo sed -i /etc/makepkg.conf \
+            -e "s|@CARCH[@]|x86_64|g" \
+            -e "s|@CHOST[@]|x86_64-pc-linux-gnu|g" \
+            -e "s|@CARCHFLAGS[@]|-march=x86-64|g"
+          sudo install -m644 etc-pacman.d-gnupg.mount /usr/lib/systemd/system/etc-pacman.d-gnupg.mount
+          sudo install -m644 pacman-init.service /usr/lib/systemd/system/pacman-init.service
+          sudo mkdir -p /etc/pacman.d
+          sudo touch /etc/pacman.d/mirrorlist
+          cd ..
+          
+          pkgver=23
+          sudo wget https://git.archlinux.org/arch-install-scripts.git/snapshot/arch-install-scripts-$pkgver.tar.gz
+          sudo tar -xvf arch-install-scripts-$pkgver.tar.gz
+          sudo make -C arch-install-scripts-$pkgver
+          sudo make -C arch-install-scripts-$pkgver check
+          sudo make -C arch-install-scripts-$pkgver PREFIX=/usr install
+          
+          sudo wget https://gitlab.manjaro.org/applications/pacman-mirrors/-/raw/v4.19x-stable/conf/pacman-mirrors.conf -O /etc/pacman-mirrors.conf
+          
+          sudo git clone https://gitlab.manjaro.org/applications/calamares-tools.git
+          
+          install_cal_tools() {
+              cd calamares-tools
+              sudo install -d /usr/share/calamares/
+              sudo cp -rv schemas/ /usr/share/calamares/
+              cd ..
+          }
+          
+          install_cal_tools
+          
+          sudo wget https://git.archlinux.org/mkinitcpio.git/snapshot/mkinitcpio-29.tar.gz
+          sudo tar -xf mkinitcpio-29.tar.gz
+          sudo make -C mkinitcpio-29 DESTDIR=/ install
+          sudo sed -i -e 's|File|Path|' /usr/share/libalpm/hooks/*hook
+
+          sudo git clone https://gitlab.manjaro.org/tools/development-tools/manjaro-tools.git
+
+          install_mjr_tools() {
+              cd manjaro-tools
+              sudo make SYSCONFDIR=/etc PREFIX=/usr DESTDIR=/ install_base
+              sudo make SYSCONFDIR=/etc PREFIX=/usr DESTDIR=/ install_yaml
+              sudo make SYSCONFDIR=/etc PREFIX=/usr DESTDIR=/ install_iso
+          }
+          
+          install_mjr_tools         
+      -
+        name: build
+        env:
+          EDITION: ${{ matrix.EDITION }}
+          BRANCH: ${{ matrix.BRANCH }}
+          SCOPE: ${{ matrix.SCOPE }}
+        run: |
+          mkdir -p manjaro-tools pkg-cache iso
+
+          [ "$SCOPE" == "minimal" ] && unset SCOPE
+
+          sudo buildiso ${SCOPE:+-f} -p $EDITION -b $BRANCH -k linux510
+          
+          ls -lasih /var/cache/manjaro-tools/iso
