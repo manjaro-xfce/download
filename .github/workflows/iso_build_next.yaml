@@ -108,7 +108,10 @@ jobs:
               sudo make SYSCONFDIR=/etc PREFIX=/usr install_iso
           }
           
-          install_mjr_tools    
+          install_mjr_tools
+          
+          # FIX-ME
+          sudo rm -v /usr/share/grub/themes/*
       -
         name: build
         env:
