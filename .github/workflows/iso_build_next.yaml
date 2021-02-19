@@ -106,6 +106,7 @@ jobs:
               sudo make SYSCONFDIR=/etc PREFIX=/usr install_base
               sudo make SYSCONFDIR=/etc PREFIX=/usr install_yaml
               sudo make SYSCONFDIR=/etc PREFIX=/usr install_iso
+              sudo sed -i -e 's|iso_name=$(get_osid)|iso_name=manjaro|g' /usr/lib/manjaro-tools/util.sh
           }
           
           install_mjr_tools
@@ -115,15 +116,7 @@ jobs:
           EDITION: ${{ matrix.EDITION }}
           BRANCH: ${{ matrix.BRANCH }}
           SCOPE: ${{ matrix.SCOPE }}
-        run: |
-          # Fix me !!!
-          sudo git clone https://gitlab.manjaro.org/packages/core/grub.git
-          cd grub
-          sudo install -D -m0644 grub.cfg /boot/grub/grub.cfg
-          sudo install -D -m0644 grub.default /etc/default/grub
-          cd ..
-          sudo mkdir -p /var/lib/manjaro-tools/buildiso/$EDITION/x86_64/livefs/usr/share/grub/themes/ubuntu-live
-                  
+        run: |                
           [ "$SCOPE" == "minimal" ] && unset SCOPE        
           sudo buildiso ${SCOPE:+-f} -p $EDITION -b $BRANCH -k linux510
           
