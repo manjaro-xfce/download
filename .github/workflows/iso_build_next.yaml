@@ -65,9 +65,9 @@ jobs:
           
           sudo git clone https://projects.archlinux.org/archlinux-keyring.git
           cd archlinux-keyring
-          install -m0644 archlinux.gpg /usr/share/pacman/keyrings/
-          install -m0644 archlinux-trusted /usr/share/pacman/keyrings/
-          install -m0644 archlinux-revoked /usr/share/pacman/keyrings/
+          sudo install -m0644 archlinux.gpg /usr/share/pacman/keyrings/
+          sudo install -m0644 archlinux-trusted /usr/share/pacman/keyrings/
+          sudo install -m0644 archlinux-revoked /usr/share/pacman/keyrings/
           cd ..          
                     
           sudo pacman-key --init
