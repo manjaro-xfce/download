@@ -77,16 +77,17 @@ jobs:
           
           sudo wget https://git.archlinux.org/mkinitcpio.git/snapshot/mkinitcpio-29.tar.gz
           sudo tar -xf mkinitcpio-29.tar.gz
-          sudo make -C mkinitcpio-29 DESTDIR=/ install
+          sudo make -C mkinitcpio-29 install
           sudo sed -i -e 's|File|Path|' /usr/share/libalpm/hooks/*hook
 
           sudo git clone https://gitlab.manjaro.org/tools/development-tools/manjaro-tools.git
 
           install_mjr_tools() {
               cd manjaro-tools
-              sudo make SYSCONFDIR=/etc PREFIX=/usr DESTDIR=/ install_base
-              sudo make SYSCONFDIR=/etc PREFIX=/usr DESTDIR=/ install_yaml
-              sudo make SYSCONFDIR=/etc PREFIX=/usr DESTDIR=/ install_iso
+              sudo make SYSCONFDIR=/etc PREFIX=/usr
+              sudo make SYSCONFDIR=/etc PREFIX=/usr install_base
+              sudo make SYSCONFDIR=/etc PREFIX=/usr install_yaml
+              sudo make SYSCONFDIR=/etc PREFIX=/usr install_iso
           }
           
           install_mjr_tools         
