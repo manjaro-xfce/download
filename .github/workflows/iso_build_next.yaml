@@ -61,7 +61,7 @@ jobs:
           cd ..
           
           sudo git clone https://projects.archlinux.org/archlinux-keyring.git
-          cd manjaro-keyring
+          cd archlinux-keyring
           sudo make PREFIX=/usr install
           cd ..          
                     
